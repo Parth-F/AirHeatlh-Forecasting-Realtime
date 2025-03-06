@@ -1,6 +1,6 @@
 # Real Time Air Quality Tracker with Snowflake
 
-#### Live Streamlit Application [AirHealth](https://www.jalf.com)
+#### Live Streamlit Application [AirHealth](https://www.parthf.com)
 
 - Developed a real-time air quality monitoring system by integrating India’s National Air Quality API, automating hourly data
 collection and processing from 500+ stations. Reduced reporting latency by 20%, delivering location-specific insights to
