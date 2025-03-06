@@ -1,5 +1,5 @@
 # This is a basic workflow to help you get started with Actions
-name: india_air_quality_json
+name: air_quality_json
 
 # Controls when the workflow will run
 on:
@@ -29,4 +29,4 @@ jobs:
           ls -la
           pwd
           echo ----------------------------------------------------------------------- 
-          python $home_dir/ingest-api-data.py
+          python $home_dir/aqi-data-ingest.py
