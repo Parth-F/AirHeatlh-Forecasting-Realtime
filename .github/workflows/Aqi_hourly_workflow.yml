@@ -29,4 +29,4 @@ jobs:
           ls -la
           pwd
           echo ----------------------------------------------------------------------- 
-          python $home_dir/AQI-Data-Ingestion.py
+          python $home_dir/Aqi_Automated_Data_Ingestion.py
