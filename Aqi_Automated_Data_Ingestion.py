@@ -27,7 +27,6 @@ today_string = current_time_ist.strftime('%Y_%m_%d')
 def snowpark_basic_auth() -> Session:
     connection_parameters = {
        "ACCOUNT":"VQSKFTW-CA97610",
-      #  "region":"AWS_AP_SOUTHEAST_1",
         "USER":"PARTHF4",
         "PASSWORD":"(9ineEaglesFly10111213#Sn",
         "ROLE":"SYSADMIN",
@@ -40,7 +39,6 @@ def snowpark_basic_auth() -> Session:
 
 
 def get_air_quality_data(api_key, limit):
-    # api_url = 'https://api.data.gov.in/resource/3b01bcb8-0b14-4abf-b6f2-c1bfd384ba69'
     api_url = 'https://api.data.gov.in/resource/3b01bcb8-0b14-4abf-b6f2-c1bfd384ba69'
     
     # Parameters for the API request
