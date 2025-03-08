@@ -2,6 +2,11 @@
 import streamlit as st
 import pandas as pd
 from decimal import Decimal
+
+from snowflake.snowpark import Session
+from snowflake.snowpark.context import get_active_session
+
+import streamlit as st
 import snowflake.connector
 from snowflake.snowpark.context import get_active_session
 
@@ -25,11 +30,21 @@ st.write("Connected to Snowflake, version:", version)
 # ----------------
 
 # Page Title
-st.title("Air Quality Trend - At Station Level")
-st.write("This streamlit app hosted on Snowflake")
 
 # Get Session
-session = get_active_session()
+# Create a Snowflake session
+session = Session.builder.configs({
+    "account": st.secrets["snowflake"]["account"],
+    "user": st.secrets["snowflake"]["user"],
+    "password": st.secrets["snowflake"]["password"],
+    "role": st.secrets["snowflake"]["role"],
+    "warehouse": st.secrets["snowflake"]["warehouse"],
+    "database": st.secrets["snowflake"]["database"],
+    "schema": st.secrets["snowflake"]["schema"]
+}).create()
+
+st.title("Air Quality Trend - At Station Level")
+st.write("This streamlit app hosted on Snowflake")
 
 state_option,city_option, station_option, date_option  = '','','',''
 state_query = """
@@ -92,7 +107,7 @@ if (date_option is not None):
         prominent_pollutant,
         AQI
     from 
-        aqi.consumption.air_quality_fact f 
+        aqi.consumption.aqi_fact f 
         join 
         aqi.consumption.date_dim d on d.date_pk  = f.date_fk and date(measurement_time) = '{date_option}'
         join 
