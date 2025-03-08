@@ -4,6 +4,28 @@ import pandas as pd
 from decimal import Decimal
 from snowflake.snowpark.context import get_active_session
 
+import streamlit as st
+import snowflake.connector
+
+# Connect using credentials stored in Streamlit secrets
+
+# ----------------
+conn = snowflake.connector.connect(
+    user=st.secrets["snowflake"]["user"],
+    password=st.secrets["snowflake"]["password"],
+    account=st.secrets["snowflake"]["account"],
+    warehouse=st.secrets["snowflake"]["warehouse"],
+    database=st.secrets["snowflake"]["database"],
+    schema=st.secrets["snowflake"]["schema"]
+)
+
+cur = conn.cursor()
+cur.execute("SELECT CURRENT_VERSION()")
+version = cur.fetchone()
+st.write("Connected to Snowflake, version:", version)
+
+# ----------------
+
 # Page Title
 st.title("Air Quality Trend - At Station Level")
 st.write("This streamlit app hosted on Snowflake")
