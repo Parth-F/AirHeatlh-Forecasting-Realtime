@@ -6,7 +6,8 @@
     "codespaces": {
       "openFiles": [
         "README.md",
-        "AQI_realtime_app.py"
+        "AQI_realtime_app.py",
+        "requirements.txt"
       ]
     },
     "vscode": {
