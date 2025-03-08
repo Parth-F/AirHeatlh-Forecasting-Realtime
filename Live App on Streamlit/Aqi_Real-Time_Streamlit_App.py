@@ -13,7 +13,7 @@ session = get_active_session()
 
 state_option,city_option, station_option, date_option  = '','','',''
 state_query = """
-    select state from DEV_DB.CONSUMPTION_SCH.LOCATION_DIM 
+    select state from aqi.consumption.location_dim 
     group by state 
     order by 1
 """
@@ -23,7 +23,7 @@ state_option = st.selectbox('Select State',state_list)
 #check the selection
 if (state_option is not None and len(state_option) > 1):
     city_query = f"""
-    select city from dev_db.consumption_sch.location_dim 
+    select city from aqi.consumption.location_dim 
     where 
     state = '{state_option}' group by city
     order by 1 desc
@@ -33,7 +33,7 @@ if (state_option is not None and len(state_option) > 1):
 
 if (city_option is not None and len(city_option) > 1):
     station_query = f"""
-    select station from dev_db.consumption_sch.location_dim 
+    select station from aqi.consumption.location_dim 
         where 
             state = '{state_option}' and
             city = '{city_option}'
@@ -45,7 +45,7 @@ if (city_option is not None and len(city_option) > 1):
 
 if (station_option is not None and len(station_option) > 1):
     date_query = f"""
-    select date(measurement_time) as measurement_date from dev_db.consumption_sch.date_dim
+    select date(measurement_time) as measurement_date from aqi.consumption.date_dim
         group by 1 
         order by 1 desc;
     """
@@ -72,11 +72,11 @@ if (date_option is not None):
         prominent_pollutant,
         AQI
     from 
-        dev_db.consumption_sch.air_quality_fact f 
+        aqi.consumption.air_quality_fact f 
         join 
-        dev_db.consumption_sch.date_dim d on d.date_pk  = f.date_fk and date(measurement_time) = '{date_option}'
+        aqi.consumption.date_dim d on d.date_pk  = f.date_fk and date(measurement_time) = '{date_option}'
         join 
-        dev_db.consumption_sch.location_dim l on l.location_pk  = f.location_fk and 
+        aqi.consumption.location_dim l on l.location_pk  = f.location_fk and 
         l.state = '{state_option}' and
         l.city = '{city_option}' and 
         l.station = '{station_option}'
