@@ -182,6 +182,6 @@ if (date_option is not None):
     pd_df[columns_to_convert] = pd_df[columns_to_convert].astype(float)
     pd_df['color'] = pd_df['AQI'].apply(get_aqi_color)
     
-    st.subheader(f"Station All Over India")
+    st.subheader(f"Stations All Over India")
     st.map(pd_df,zoom=4 ,size='AQI',color='color')
     st.image("Indian_aqi_scale.png", caption="Indian Air Quality Scale", use_container_width=True)
