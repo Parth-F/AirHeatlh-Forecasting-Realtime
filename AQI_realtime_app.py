@@ -41,13 +41,10 @@ session = Session.builder.configs({
     "schema": st.secrets["snowflake"]["schema"]
 }).create()
 
-
-# Page Title
 # Page Title
 st.title("Real Time Air Quality - At Station Level")
-st.write("This streamlit app hosted on Snowflake ❄️ made by Parth F")
-
-
+st.write("This streamlit app hosted on Snowflake ❄️ made by Parth F") 
+            
 state_option,city_option, station_option, date_option  = '','','',''
 state_query = """
     select state from aqi.CONSUMPTION.LOCATION_DIM 
@@ -125,23 +122,67 @@ if (date_option is not None):
     
     df_aqi = df.drop(['state','city','station','lat', 'lon','PM2.5','PM10','SO3','CO','NO2','NH3','O3','PROMINENT_POLLUTANT'], axis=1)
     df_table = df.drop(['state','city','station','lat', 'lon','PROMINENT_POLLUTANT','AQI'], axis=1)
-    df_map = df.drop(['Hour','state','city','station','PM2.5','PM10','SO3','CO','NO2','NH3','O3','PROMINENT_POLLUTANT','AQI'], axis=1)
+    df_map = df.drop(['Hour','state','city','station','PM2.5','PM10','SO3','CO','NO2','NH3','O3','PROMINENT_POLLUTANT'], axis=1)
     df_stat = df.drop(['state','city','station','lat', 'lon'], axis=1)
     
-    st.subheader(f"{city_option} AQI currently is {df_stat['AQI'].iloc[-1]}")
-    # st.caption(f'### :blue[Temporal Distribution] of Pollutants on :blue[{date_option}]')
-    st.dataframe(df_stat)
-    st.subheader(f"Hourly AQI Levels")
-    st.line_chart(df_aqi,x="Hour", color = '#FFA500')
-    st.subheader(f"Stacked Chart:  Hourly Individual Pollutant Level")
-    # st.caption(f'### :blue[Temporal Distribution] of Pollutants on :blue[{date_option}]')
-    st.bar_chart(df_table,x="Hour")
-    st.subheader(f"Line Chart: Hourly Pollutant Levels")
-    # st.caption(f'### Hourly Trends in Pollutant Levels - :blue[{date_option}]')
-    st.line_chart(df_table,x="Hour")
-    
+    def get_aqi_color(aqi):
+        if aqi <= 50:
+            return "#66ff33" 
+        elif aqi <= 100:
+            return "#99ffbb"
+        elif aqi <= 150:
+            return "#ff8000"  
+        elif aqi <= 200:
+            return "#ff8000"  
+        elif aqi <= 300:
+            return "#ff3300" 
+        elif aqi <= 400:
+            return "#ff3399" 
+        elif aqi <= 500:
+            return "#ff3399" 
+        else:
+            return "#800080" 
+
+    st.subheader(f"{station_option}, - AQI : {df_stat['AQI'].iloc[-1]}")
     columns_to_convert = ['lat', 'lon']
     df_map[columns_to_convert] = df_map[columns_to_convert].astype(float)
-    st.subheader(f"{station_option}")
-    st.map(df_map,size="AQI") # the size argument does not work in snowflake instance
+    df_map['color'] = df_map['AQI'].apply(get_aqi_color)
+    st.map(df_map,zoom=14, size='AQI',color='color')
     
+    st.subheader(f"Hourly AQI Levels")
+    st.line_chart(df_aqi,x="Hour", color = '#FFA500')
+    st.dataframe(df_stat)
+
+    st.subheader(f"Stacked Chart:  Hourly Individual Pollutant Level")
+    st.bar_chart(df_table,x="Hour")
+
+    st.subheader(f"Line Chart: Hourly Pollutant Levels")
+    st.line_chart(df_table,x="Hour")
+   
+   
+    # sql statement
+    sql_stmt = """
+    select l.latitude, l.longitude,f.aqi
+            from 
+            aqi.consumption.aqi_fact f
+            join aqi.consumption.location_dim l on l.location_pk = f.location_fk
+        where 
+        date_fk = (select date_pk from aqi.consumption.date_dim
+        order by measurement_time desc 
+        limit 1 )
+    """
+
+        
+    # create a data frame
+    sf_df = session.sql(sql_stmt).collect()
+    
+    pd_df =pd.DataFrame(
+            sf_df,
+            columns=['lat','lon','AQI'])
+
+    columns_to_convert = ['lat', 'lon']
+    pd_df[columns_to_convert] = pd_df[columns_to_convert].astype(float)
+    pd_df['color'] = pd_df['AQI'].apply(get_aqi_color)
+    
+    st.subheader(f"Station All Over India")
+    st.map(pd_df,zoom=4 ,size='AQI',color='color')
