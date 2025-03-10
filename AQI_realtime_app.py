@@ -44,7 +44,7 @@ session = Session.builder.configs({
 
 # Page Title
 # Page Title
-st.title("Air Quality - At Station Level")
+st.title("Real Time Air Quality - At Station Level")
 st.write("This streamlit app hosted on Snowflake ❄️ made by Parth F")
 
 
