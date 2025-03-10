@@ -130,13 +130,13 @@ if (date_option is not None):
             return "#00B150" 
         elif aqi <= 100:
             return "#96CD5D" 
-        elif aqi <= 200:
+        elif aqi <= 150:
             return "#FFFF00"  
-        elif aqi <= 300:
+        elif aqi <= 200:
             return "#FFBF00" 
-        elif aqi <= 400:
+        elif aqi <= 250:
             return "#FF0000" 
-        elif aqi <= 500:
+        elif aqi <= 400:
             return "#771A83" 
         else:
             return "#96CD5D" 
