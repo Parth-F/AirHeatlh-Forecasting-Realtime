@@ -123,7 +123,7 @@ if (date_option is not None):
     df_map = df.drop(['Hour','state','city','station','PM2.5','PM10','SO3','CO','NO2','NH3','O3','PROMINENT_POLLUTANT','AQI'], axis=1)
     df_stat = df.drop(['state','city','station','lat', 'lon'], axis=1)
     
-    st.subheader(f"{city_option} - {station_option} AQI currently is {df_stat['AQI'].iloc[-1]}")
+    st.subheader(f"{city_option} AQI currently is {df_stat['AQI'].iloc[-1]}")
     # st.caption(f'### :blue[Temporal Distribution] of Pollutants on :blue[{date_option}]')
     st.dataframe(df_stat)
     st.subheader(f"Hourly AQI Levels")
