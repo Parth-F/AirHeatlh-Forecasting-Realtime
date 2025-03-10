@@ -7,7 +7,7 @@ name: AQI_Hourly_Ingestion
   # workflow_dispatch:
 on:
   schedule:
-     - cron: '30 * * * *'  # Runs every 45th min
+     - cron: '20,40 * * * *'  # Runs every 45th min
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
