@@ -145,7 +145,7 @@ if (date_option is not None):
     columns_to_convert = ['lat', 'lon']
     df_map[columns_to_convert] = df_map[columns_to_convert].astype(float)
     df_map['color'] = df_map['AQI'].apply(get_aqi_color)
-    st.map(df_map,zoom=14, size='AQI',color='color')
+    st.map(df_map,zoom=13, size='AQI',color='color')
     
     st.subheader(f"Hourly AQI Levels")
     st.line_chart(df_aqi,x="Hour", color = '#FFA500')
