@@ -186,4 +186,8 @@ if (date_option is not None):
     
     st.subheader(f"Station All Over India")
     st.map(pd_df,zoom=4 ,size='AQI',color='color')
-    st.image("AQI_Scale.png", caption="AQI Scale", use_container_width=False)
+    # st.image("AQI_Scale.png", caption="AQI Scale", use_container_width=False, )
+    st.markdown(
+    "<p style='text-align: center;'><img src='AQI_Scale.png' width='300'></p>",
+    unsafe_allow_html=True
+    )
