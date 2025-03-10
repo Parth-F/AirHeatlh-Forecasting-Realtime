@@ -43,6 +43,11 @@ session = Session.builder.configs({
 
 
 # Page Title
+# Page Title
+st.title("Air Quality - At Station Level")
+st.write("This streamlit app hosted on Snowflake ❄️ made by Parth F")
+
+
 state_option,city_option, station_option, date_option  = '','','',''
 state_query = """
     select state from aqi.CONSUMPTION.LOCATION_DIM 
