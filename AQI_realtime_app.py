@@ -127,21 +127,19 @@ if (date_option is not None):
     
     def get_aqi_color(aqi):
         if aqi <= 50:
-            return "#66ff33" 
+            return "#00B150" 
         elif aqi <= 100:
-            return "#99ffbb"
-        elif aqi <= 150:
-            return "#ff8000"  
+            return "#96CD5D" 
         elif aqi <= 200:
-            return "#ff8000"  
+            return "#FFFF00"  
         elif aqi <= 300:
-            return "#ff3300" 
+            return "#FFBF00" 
         elif aqi <= 400:
-            return "#ff3399" 
+            return "#FF0000" 
         elif aqi <= 500:
-            return "#ff3399" 
+            return "#771A83" 
         else:
-            return "#800080" 
+            return "#96CD5D" 
 
     st.subheader(f"{station_option}, - AQI : {df_stat['AQI'].iloc[-1]}")
     columns_to_convert = ['lat', 'lon']
@@ -186,8 +184,4 @@ if (date_option is not None):
     
     st.subheader(f"Station All Over India")
     st.map(pd_df,zoom=4 ,size='AQI',color='color')
-    # st.image("AQI_Scale.png", caption="AQI Scale", use_container_width=False, )
-    st.markdown(
-    "<p style='text-align: center;'><img src='AQI_Scale.png' width='300'></p>",
-    unsafe_allow_html=True
-    )
+    st.image("Indian_aqi_scale.png", caption="Indian Air Quality Scale", use_container_width=True)
