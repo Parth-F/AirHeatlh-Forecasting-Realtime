@@ -1,16 +1,14 @@
-# Import python packages
+# import python packages
 import streamlit as st
 import pandas as pd
-from decimal import Decimal
+from decimal import decimal
 
 import snowflake.connector
-from snowflake.snowpark import Session
+from snowflake.snowpark import session
 from snowflake.snowpark.context import get_active_session
 
 
-# Connect using credentials stored in Streamlit secrets
-
-# ----------------
+# connect using credentials stored in streamlit secrets
 conn = snowflake.connector.connect(
     user=st.secrets["snowflake"]["user"],
     password=st.secrets["snowflake"]["password"],
@@ -21,15 +19,14 @@ conn = snowflake.connector.connect(
 )
 
 cur = conn.cursor()
-cur.execute("SELECT CURRENT_VERSION()")
+cur.execute("select current_version()")
 version = cur.fetchone()
-st.write("Connected to Snowflake, version:", version)
+st.write("connected to snowflake, version:", version)
 
-# ----------------
 
-# Get Session
-# Create a Snowflake session
-session = Session.builder.configs({
+# get session
+# create a snowflake session
+session = session.builder.configs({
     "account": st.secrets["snowflake"]["account"],
     "user": st.secrets["snowflake"]["user"],
     "password": st.secrets["snowflake"]["password"],
@@ -39,33 +36,34 @@ session = Session.builder.configs({
     "schema": st.secrets["snowflake"]["schema"]
 }).create()
 
-# Page Title
-st.title("Real Time Air Quality - At Station Level")
-st.write("This streamlit app hosted on Snowflake ❄️ made by Parth F") 
+
+# page title
+st.title("real time air quality - at station level")
+st.write("this streamlit app hosted on snowflake ❄️ made by parth f") 
             
 state_option,city_option, station_option, date_option  = '','','',''
 state_query = """
-    select state from aqi.CONSUMPTION.LOCATION_DIM 
+    select state from aqi.consumption.location_dim 
     group by state 
     order by 1
 """
 state_list = session.sql(state_query).collect()
-state_option = st.selectbox('Select State',state_list)
+state_option = st.selectbox('select state',state_list)
 
 #check the selection
-if (state_option is not None and len(state_option) > 1):
+if (state_option is not none and len(state_option) > 1):
     city_query = f"""
-    select city from aqi.CONSUMPTION.location_dim 
+    select city from aqi.consumption.location_dim 
     where 
     state = '{state_option}' group by city
     order by 1 desc
     """
     city_list = session.sql(city_query).collect()
-    city_option = st.selectbox('Select City',city_list)
+    city_option = st.selectbox('select city',city_list)
 
-if (city_option is not None and len(city_option) > 1):
+if (city_option is not none and len(city_option) > 1):
     station_query = f"""
-    select station from aqi.CONSUMPTION.location_dim 
+    select station from aqi.consumption.location_dim 
         where 
             state = '{state_option}' and
             city = '{city_option}'
@@ -73,22 +71,22 @@ if (city_option is not None and len(city_option) > 1):
         order by 1 desc;
     """
     station_list = session.sql(station_query).collect()
-    station_option = st.selectbox('Select Station',station_list)
+    station_option = st.selectbox('select station',station_list)
 
-if (station_option is not None and len(station_option) > 1):
+if (station_option is not none and len(station_option) > 1):
     date_query = f"""
-    select date(measurement_time) as measurement_date from aqi.CONSUMPTION.date_dim
+    select date(measurement_time) as measurement_date from aqi.consumption.date_dim
         group by 1 
         order by 1 desc;
     """
     date_list = session.sql(date_query).collect()
-    date_option = st.selectbox('Select Date',date_list)
+    date_option = st.selectbox('select date',date_list)
 
 
-if (date_option is not None):
+if (date_option is not none):
     trend_sql = f"""
     select 
-        hour(measurement_time) as Hour,
+        hour(measurement_time) as hour,
         l.state,
         l.city,
         l.station,
@@ -102,13 +100,13 @@ if (date_option is not None):
         co_avg,
         o3_avg,
         prominent_pollutant,
-        AQI
+        aqi
     from 
-        aqi.CONSUMPTION.aqi_fact f 
+        aqi.consumption.aqi_fact f 
         join 
-        aqi.CONSUMPTION.date_dim d on d.date_pk  = f.date_fk and date(measurement_time) = '{date_option}'
+        aqi.consumption.date_dim d on d.date_pk  = f.date_fk and date(measurement_time) = '{date_option}'
         join 
-        aqi.CONSUMPTION.location_dim l on l.location_pk  = f.location_fk and 
+        aqi.consumption.location_dim l on l.location_pk  = f.location_fk and 
         l.state = '{state_option}' and
         l.city = '{city_option}' and 
         l.station = '{station_option}'
@@ -116,45 +114,45 @@ if (date_option is not None):
     """
     sf_df = session.sql(trend_sql).collect()
 
-    df = pd.DataFrame(sf_df,columns=['Hour','state','city','station','lat', 'lon','PM2.5','PM10','SO3','CO','NO2','NH3','O3','PROMINENT_POLLUTANT','AQI'])
+    df = pd.dataframe(sf_df,columns=['hour','state','city','station','lat', 'lon','pm2.5','pm10','so3','co','no2','nh3','o3','prominent_pollutant','aqi'])
     
-    df_aqi = df.drop(['state','city','station','lat', 'lon','PM2.5','PM10','SO3','CO','NO2','NH3','O3','PROMINENT_POLLUTANT'], axis=1)
-    df_table = df.drop(['state','city','station','lat', 'lon','PROMINENT_POLLUTANT','AQI'], axis=1)
-    df_map = df.drop(['Hour','state','city','station','PM2.5','PM10','SO3','CO','NO2','NH3','O3','PROMINENT_POLLUTANT'], axis=1)
+    df_aqi = df.drop(['state','city','station','lat', 'lon','pm2.5','pm10','so3','co','no2','nh3','o3','prominent_pollutant'], axis=1)
+    df_table = df.drop(['state','city','station','lat', 'lon','prominent_pollutant','aqi'], axis=1)
+    df_map = df.drop(['hour','state','city','station','pm2.5','pm10','so3','co','no2','nh3','o3','prominent_pollutant'], axis=1)
     df_stat = df.drop(['state','city','station','lat', 'lon'], axis=1)
     
     def get_aqi_color(aqi):
         if aqi <= 50:
-            return "#00B150" 
+            return "#00b150" 
         elif aqi <= 100:
-            return "#96CD5D" 
+            return "#96cd5d" 
         elif aqi <= 150:
-            return "#FFFF00"  
+            return "#ffff00"  
         elif aqi <= 200:
-            return "#FFBF00" 
+            return "#ffbf00" 
         elif aqi <= 250:
-            return "#FF0000" 
+            return "#ff0000" 
         elif aqi <= 400:
-            return "#771A83" 
+            return "#771a83" 
         else:
-            return "#96CD5D" 
+            return "#96cd5d" 
 
-    st.subheader(f"{station_option}, - AQI : {df_stat['AQI'].iloc[-1]}")
+    st.subheader(f"{station_option}, - aqi : {df_stat['aqi'].iloc[-1]}")
     columns_to_convert = ['lat', 'lon']
     df_map[columns_to_convert] = df_map[columns_to_convert].astype(float)
-    df_map['color'] = df_map['AQI'].apply(get_aqi_color)
-    st.map(df_map, zoom=13, size='AQI',color='color')
+    df_map['color'] = df_map['aqi'].apply(get_aqi_color)
+    st.map(df_map, zoom=13, size='aqi',color='color')
     
-    st.subheader(f"Hourly AQI Levels")
-    st.line_chart(df_aqi,x="Hour", color = '#FFA500', height=250)
+    st.subheader(f"hourly aqi levels")
+    st.line_chart(df_aqi,x="hour", color = '#ffa500', height=250)
 
-    st.subheader(f"Stacked Chart:  Hourly Individual Pollutant Level")
-    st.bar_chart(df_table,x="Hour")
-    df_stat = df_stat.rename(columns={'PROMINENT_POLLUTANT': 'PROMINENT'})
-    st.dataframe(df_stat.iloc[::-1], hide_index=True, height=127, column_order=['Hour','AQI','PROMINENT','PM2.5','PM10','SO3','CO','NO2','NH3','O3'])
+    st.subheader(f"stacked chart:  hourly individual pollutant level")
+    st.bar_chart(df_table,x="hour")
+    df_stat = df_stat.rename(columns={'prominent_pollutant': 'prominent'})
+    st.dataframe(df_stat.iloc[::-1], hide_index=true, height=127)
 
-    st.subheader(f"Line Chart: Hourly Pollutant Levels")
-    st.line_chart(df_table,x="Hour")  
+    st.subheader(f"line chart: hourly pollutant levels")
+    st.line_chart(df_table,x="hour")  
    
     # sql statement
     sql_stmt = """
@@ -171,14 +169,14 @@ if (date_option is not None):
     # create a data frame
     sf_df = session.sql(sql_stmt).collect()
     
-    pd_df =pd.DataFrame(
+    pd_df =pd.dataframe(
             sf_df,
-            columns=['lat','lon','AQI'])
+            columns=['lat','lon','aqi'])
 
     columns_to_convert = ['lat', 'lon']
     pd_df[columns_to_convert] = pd_df[columns_to_convert].astype(float)
-    pd_df['color'] = pd_df['AQI'].apply(get_aqi_color)
+    pd_df['color'] = pd_df['aqi'].apply(get_aqi_color)
     
-    st.subheader(f"Stations All Over India")
-    st.map(pd_df,zoom=4 ,size='AQI',color='color')
-    st.image("Indian_aqi_scale.png", caption="Indian Air Quality Scale", use_container_width=True)
+    st.subheader(f"stations all over india")
+    st.map(pd_df,zoom=4 ,size='aqi',color='color')
+    st.image("indian_aqi_scale.png", caption="indian air quality scale", use_container_width=true)
