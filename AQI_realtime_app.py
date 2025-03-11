@@ -2,6 +2,8 @@
 import streamlit as st
 import pandas as pd
 from decimal import Decimal
+import matplotlib.pyplot as plt
+import numpy as np
 
 from snowflake.snowpark import Session
 from snowflake.snowpark.context import get_active_session
