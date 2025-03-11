@@ -3,12 +3,10 @@ import streamlit as st
 import pandas as pd
 from decimal import Decimal
 
+import snowflake.connector
 from snowflake.snowpark import Session
 from snowflake.snowpark.context import get_active_session
 
-import streamlit as st
-import snowflake.connector
-from snowflake.snowpark.context import get_active_session
 
 # Connect using credentials stored in Streamlit secrets
 
