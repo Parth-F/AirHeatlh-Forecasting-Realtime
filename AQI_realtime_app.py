@@ -149,7 +149,7 @@ if (date_option is not none):
     st.subheader(f"stacked chart:  hourly individual pollutant level")
     st.bar_chart(df_table,x="hour")
     df_stat = df_stat.rename(columns={'prominent_pollutant': 'prominent'})
-    st.dataframe(df_stat.iloc[::-1], hide_index=true, height=127)
+    st.dataframe(df_stat.iloc[::-1], hide_index=true, height=127, column_order=['hour','pm2.5','pm10','so3','co','no2','nh3','o3','prominent','aqi'])
 
     st.subheader(f"line chart: hourly pollutant levels")
     st.line_chart(df_table,x="hour")  
