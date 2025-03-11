@@ -145,11 +145,12 @@ if (date_option is not None):
     columns_to_convert = ['lat', 'lon']
     df_map[columns_to_convert] = df_map[columns_to_convert].astype(float)
     df_map['color'] = df_map['AQI'].apply(get_aqi_color)
-    st.map(df_map,zoom=13, size='AQI',color='color')
+    st.map(df_map, zoom=13, size='AQI',color='color')
     
     st.subheader(f"Hourly AQI Levels")
     st.line_chart(df_aqi,x="Hour", color = '#FFA500')
-    st.dataframe(df_stat, hide_index=True, height=100)
+    df_stat = df_stat.rename(columns={'PROMINENT_POLLUTANT': 'PROMINENT'})
+    st.dataframe(df_stat.iloc[::-1], hide_index=True, height=100, column_order=['Hour','AQI','PROMINENT','PM2.5','PM10','SO3','CO','NO2','NH3','O3'])
 
     st.subheader(f"Stacked Chart:  Hourly Individual Pollutant Level")
     st.bar_chart(df_table,x="Hour")
@@ -170,7 +171,6 @@ if (date_option is not None):
         limit 1 )
     """
 
-        
     # create a data frame
     sf_df = session.sql(sql_stmt).collect()
     
