@@ -148,7 +148,7 @@ if (date_option is not None):
     st.map(df_map, zoom=13, size='AQI',color='color')
     
     st.subheader(f"Hourly AQI Levels")
-    st.line_chart(df_aqi,x="Hour", color = '#FFA500')
+    st.area_chart(df_aqi,x="Hour", color = '#FFA500', height=250)
 
     st.subheader(f"Stacked Chart:  Hourly Individual Pollutant Level")
     st.bar_chart(df_table,x="Hour")
