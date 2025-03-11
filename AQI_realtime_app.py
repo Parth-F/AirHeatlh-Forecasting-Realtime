@@ -150,6 +150,22 @@ if (date_option is not None):
     st.subheader(f"Hourly AQI Levels")
     st.area_chart(df_aqi,x="Hour", color = '#FFA500', height=250)
 
+    # Create figure
+    fig, ax = plt.subplots(figsize=(6, 3))  # Adjust width and height
+
+    # Create a gradient fill using multiple alpha values
+    for i in range(10):  # 10 layers for smooth gradient
+        ax.fill_between(df_aqi["Hour"], df_aqi["AQI"], color='#FFA500', alpha=(i+1) / 15)
+
+    # Add the line on top
+    ax.plot(df_aqi["Hour"], df_aqi["AQI"], color='#FF8C00', linewidth=2)
+
+    # Remove spines for a cleaner look
+    ax.spines[['top', 'right']].set_visible(False)
+
+    # Display in Streamlit
+    st.pyplot(fig)
+
     st.subheader(f"Stacked Chart:  Hourly Individual Pollutant Level")
     st.bar_chart(df_table,x="Hour")
     df_stat = df_stat.rename(columns={'PROMINENT_POLLUTANT': 'PROMINENT'})
